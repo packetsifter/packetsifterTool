@@ -9,7 +9,7 @@ PackerSifter does NOT perform analysis for you. It simply sifts through data and
 
 
 # How it works
-Simply pass PacketSifter your pcap to analyze and answer y or n when prompted and you're done!
+Simply pass PacketSifter your pcap to analyze and answer Y or N when prompted and you're done!
 
 <h5>Example:</h5> 
   root@ubuntu:~# ./packetsifter testing.pcap
