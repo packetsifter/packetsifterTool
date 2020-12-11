@@ -49,7 +49,7 @@ tshark -nr $pcap -q -z http_srv,tree >> http_info.txt 2>>errors.txt
 printf '\nStatistical data about HTTP conversations have been generated and are available in: http_info.txt\n'
 
 #ask to resolve hostnames
-printf '\nWould you like to resolve host names observed in pcap?\n'
+printf '\nWould you like to resolve host names observed in pcap? This may take a long time depending on the pcap!!\n'
 printf '<<Warning>> This can result in DNS queries for attacker infrastructure. Proceed with caution!!\n'
 printf '(Please supply Y for yes or N for no)\n'
 read hostnameAnswer
@@ -57,14 +57,14 @@ read hostnameAnswer
 #if statement for host resolution
 if [  $hostnameAnswer == 'Y' ] || [ $hostnameAnswer == 'y' ]
 then
-	tshark -r $pcap -N Nnt -z hosts > deletethis.txt 2>>errors.txt
-	cat deletethis.txt | grep '#' -A 100000000 > hostnamesResolved.txt
+	tshark -nr $pcap -N Nnt -z hosts > deletethis.txt 2>>errors.txt
+	cat deletethis.txt | grep '# TShark' -A 100000000 > hostnamesResolved.txt
 	rm deletethis.txt
 	printf '\nhostnamesResolved.txt contains resolved hostnames observed in pcap\n'
 fi
 
 #HTTP pcap carving
-tshark -r $pcap -n -Y '(tcp.port==80 || tcp.port==8080 || tcp.port==8000)' -w http.pcap 2>>errors.txt
+tshark -nr $pcap -n -Y '(tcp.port==80 || tcp.port==8080 || tcp.port==8000)' -w http.pcap 2>>errors.txt
 printf 'http.pcap contains all conversations containing port 80,8080,8000\n'
 
 #prompt for user input to export
@@ -88,8 +88,8 @@ fi
 printf '\n\n\n################# SMB SIFTING #################\n\n'
 
 printf '\nStats on commands ran using smb or smb2 has been generated and is available in: SMBstatistics.txt\n'
-tshark -r nmap_host_scan_tcp.pcap -q -z smb,srt > SMBstatistics.txt 2>>errors.txt
-tshark -r nmap_host_scan_tcp.pcap -q -z smb2,srt >> SMBstatistics.txt 2>>errors.txt
+tshark -nr $pcap -q -z smb,srt > SMBstatistics.txt 2>>errors.txt
+tshark -nr $pcap -q -z smb2,srt >> SMBstatistics.txt 2>>errors.txt
 
 printf 'smb.pcap contains all conversations categorized by tshark dissectors as NBSS, SMB, or SMB2\n'
 tshark -nr $pcap -Y nbss -w smb.pcap 2>>errors.txt
