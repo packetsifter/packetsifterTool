@@ -5,7 +5,7 @@ PackerSifter does NOT perform analysis for you. It simply sifts through data and
 
 
 # Author
-    Ross Burke (packetsifter)
+    Ross Burke (Twitter @packetsifter)
 
 
 # How it works
