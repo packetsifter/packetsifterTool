@@ -12,7 +12,7 @@ PackerSifter does NOT perform analysis for you. It simply sifts through data and
 Simply pass PacketSifter your pcap to analyze and answer Y or N when prompted and you're done!
 
 <h5>Example:</h5> 
-  root@ubuntu:~# ./packetsifter testing.pcap
+  root@ubuntu:~# ./packetsifter /tmp/testing.pcap
 
 # Requirements
   tshark - https://tshark.dev/setup/install/
