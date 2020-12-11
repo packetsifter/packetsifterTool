@@ -17,14 +17,14 @@ Simply pass PacketSifter your pcap to analyze and answer Y or N when prompted an
 # Requirements
   tshark - https://tshark.dev/setup/install/
 # Output 
-Currently, PacketSifter generates the following pcaps:
+Currently, PacketSifter generates the following pcaps:<br>
    <ul>
   <li>http.pcap - All conversations containing port 80, 8080, or 8000</li>
   <li>smb.pcap - All conversations categorized by tshark dissectors as NBSS, SMB, or SMB2 </li>
   <li>dns.pcap - All conversations categorized by tshark dissectors as DNS</li>
   <li>ftp.pcap - All conversations categorized by tshark dissectors as FTP</li>
 </ul> 
-
+<br>
 Currently, PacketSifter generates the following text files:
    <ul>
   <li>IOstatistics.txt - Protocol Hierarchy and Input/Output broken up in 30 second intervals (useful to find potential beaconing)</li>
@@ -37,7 +37,7 @@ Currently, PacketSifter generates the following text files:
   <li>dnsTXTRecords.txt - DNS TXT query/responses </li>
   <li>errors.txt - trash file </li>
 </ul>
-
+<br>
 Currently, PacketSifter generates the following tar.gz files:
   <ul>
  <li>httpObjects.tar.gz (optional) - HTTP objects observed in pcap. <<Warning>> There could be a lot of HTTP objects and you can potentially extract malicious http objects depending on the pcap. Use with caution!! </li>
