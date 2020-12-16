@@ -45,4 +45,5 @@ Currently, PacketSifter generates the following tar.gz files:
 </ul>
 
 # Looking into the future
+Automatic MD5 hash lookup of exported HTTP or SMB objects via VirusTotal<br>
 Reach out if you have suggestions as to what else you'd like sifted or what else could be useful for the tool.
