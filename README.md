@@ -44,6 +44,8 @@ Currently, PacketSifter generates the following tar.gz files:
  <li>smbObjects.tar.gz (optional) - SMB objects observed in pcap. There could be a lot of SMB objects and you can potentially extract malicious SMB objects depending on the pcap. Use with caution!! </li>
 </ul>
 
-# Looking into the future
+# In the pipeline
 Automatic MD5 hash lookup of exported HTTP or SMB objects via VirusTotal<br>
+
+# Suggestion?
 Reach out if you have suggestions as to what else you'd like sifted or what else could be useful for the tool.
