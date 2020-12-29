@@ -37,7 +37,7 @@ printf 'IPstatistics contains overall stats to/from endpoints over IP and indivi
 #TCP Statistics
 tshark -nr $pcap -q -z endpoints,tcp > TCPstatistics.txt 2>>errors.txt
 tshark -nr $pcap -q -z conv,tcp >> TCPstatistics.txt 2>>errors.txt
-printf '\n\n\nTCPstatistics have been gerenated and are available in: TCPstatistics.txt\n'
+printf '\n\n\nTCPstatistics have been generated and are available in: TCPstatistics.txt\n'
 printf 'TCPstatistics contains overall stats to/from endpoints over TCP and individual TCP conversations broken down. <<Warning>> This file can contain a large amount of information. It is recommended to use less or grep for a conversation in question.\n'
 
 
