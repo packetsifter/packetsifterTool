@@ -126,7 +126,7 @@ if [[ $smbstatscheck == 18 ]]; then
 	printf '\nNo SMB traffic found. Deleting arbitrary SMBstatistics.txt\n'
 fi
 
-printf 'smb.pcap contains all conversations categorized by tshark dissectors as NBSS, SMB, or SMB2\n'
+printf '\nsmb.pcap contains all conversations categorized by tshark dissectors as NBSS, SMB, or SMB2\n'
 tshark -nr $pcap -Y nbss -w smb.pcap 2>>errors.txt
 
 #SMB pcap check
