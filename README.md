@@ -51,7 +51,7 @@ VirusTotal Integration output text files (all optional):
         <li>httpVTResults.txt - Text file containing results of md5 hash lookup of http objects via VirusTotal API </li>
         <li>smbHashToObject.txt - Text file containing md5 hash to object pairing for reference </li>
         <li>smbVTResults.txt - Text file containing results of md5 hash lookup of smb objects via VirusTotal API </li>
-    <ul><br>
+    </ul><br>
 Currently, PacketSifter generates the following tar.gz files:
 <ul>
 <li>httpObjects.tar.gz (optional) - HTTP objects observed in pcap. <<Warning>> There could be a lot of HTTP objects and you can potentially extract malicious http objects depending on the pcap. Use with caution!! </li>
@@ -63,17 +63,19 @@ PacketSifter can now perform hash lookups via VirusTotal API of exported objects
 <br>
 <b>Steps to configure PacketSifter with VirusTotal integration:</b><br>
 <br>
-1. Ensure you have jq (https://stedolan.github.io/jq/download/) installed.<br>
+
+1. Ensure you have jq (https://stedolan.github.io/jq/download/)installed. <br>
 
         root@ubuntu:~# apt-get install jq
-<br>
-2. Ensure you have curl installed.<br>
+        
+2. Ensure you have curl installed. <br>
 
          root@ubuntu:~# apt-get install curl
 <br>
-3. Download the new version of packetsifter.sh and the new script VTInitial.sh.<br>
-4. Run VTInitial.sh in the same folder as packetsifter.sh and supply your 64 character alphanumeric VirusTotal API Key.<br>
+3. Download the new version of packetsifter.sh and the new script VTInitial.sh <br>
+4. Run VTInitial.sh in the same folder as packetsifter.sh and supply your 64 character alphanumeric VirusTotal API Key <br>
         &emsp;For instructions on how to obtain a free VirusTotal API Key https://developers.virustotal.com/reference <br>
+
 
         
 
