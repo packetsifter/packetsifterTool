@@ -3,6 +3,9 @@
 PacketSifter is a tool/script that is designed to aid analysts in sifting through a packet capture (pcap) to find noteworthy traffic. Packetsifter accepts a pcap as an argument and outputs several files.<br>
 PackerSifter does NOT perform analysis for you. It simply sifts through data and puts specific pieces of data in buckets for ease of analysis. PacketSifter can be used to find IOCs present in a pcap however, you must still be able to interpret the data and drill down into the pcap to find points of interest.
 
+<b>01/08/2021</b><br>
+PacketSifter has received a major update to support VirusTotal lookups of objects exported by PacketSifter.
+
 <b>12/31/2020</b><br>
 Updated to delete associated txt/pcap files that contain 0 results, i.e., when 0 SMB results are found in pcap, all associated SMB output files produced by PacketSifter will be automatically deleted.
 
@@ -15,6 +18,7 @@ Updated to delete associated txt/pcap files that contain 0 results, i.e., when 0
 Simply pass PacketSifter your pcap to analyze and answer Y or N when prompted and you're done!
 
 <h5>Example:</h5> 
+
   root@ubuntu:~# ./packetsifter /tmp/testing.pcap
 
 # Requirements
@@ -38,17 +42,42 @@ Currently, PacketSifter generates the following text files:
   <li>SMBstatistics.txt - Stats on commands ran using smb or smb2 </li>
   <li>dnsARecords.txt - DNS A query/responses </li>
   <li>dnsTXTRecords.txt - DNS TXT query/responses </li>
-  <li>errors.txt - trash file </li>
+  <li>errors.txt - trash file </li> 
 </ul>
 <br>
+VirusTotal Integration output text files (all optional):
+    <ul>
+        <li>httpHashToObject.txt - Text file containing md5 hash to object pairing for reference </li>
+        <li>httpVTResults.txt - Text file containing results of md5 hash lookup of http objects via VirusTotal API </li>
+        <li>smbHashToObject.txt - Text file containing md5 hash to object pairing for reference </li>
+        <li>smbVTResults.txt - Text file containing results of md5 hash lookup of smb objects via VirusTotal API </li>
+    <ul><br>
 Currently, PacketSifter generates the following tar.gz files:
-  <ul>
- <li>httpObjects.tar.gz (optional) - HTTP objects observed in pcap. <<Warning>> There could be a lot of HTTP objects and you can potentially extract malicious http objects depending on the pcap. Use with caution!! </li>
- <li>smbObjects.tar.gz (optional) - SMB objects observed in pcap. There could be a lot of SMB objects and you can potentially extract malicious SMB objects depending on the pcap. Use with caution!! </li>
+<ul>
+<li>httpObjects.tar.gz (optional) - HTTP objects observed in pcap. <<Warning>> There could be a lot of HTTP objects and you can potentially extract malicious http objects depending on the pcap. Use with caution!! </li>
+<li>smbObjects.tar.gz (optional) - SMB objects observed in pcap. There could be a lot of SMB objects and you can potentially extract malicious SMB objects depending on the pcap. Use with caution!! </li>
 </ul>
 
-# In the pipeline
-Automatic MD5 hash lookup of exported HTTP or SMB objects via VirusTotal<br>
+# VirusTotal Integration
+PacketSifter can now perform hash lookups via VirusTotal API of exported objects found via SMB/HTTP.<br>
+<br>
+<b>Steps to configure PacketSifter with VirusTotal integration:</b><br>
+<br>
+1. Ensure you have jq (https://stedolan.github.io/jq/download/) installed.<br>
 
-# Suggestion?
+        root@ubuntu:~# apt-get install jq
+<br>
+2. Ensure you have curl installed.<br>
+
+         root@ubuntu:~# apt-get install curl
+<br>
+3. Download the new version of packetsifter.sh and the new script VTInitial.sh.<br>
+4. Run VTInitial.sh in the same folder as packetsifter.sh and supply your 64 character alphanumeric VirusTotal API Key.<br>
+        &emsp;For instructions on how to obtain a free VirusTotal API Key https://developers.virustotal.com/reference <br>
+
+        
+
+
+
+# Suggestions?
 Reach out if you have suggestions as to what else you'd like sifted or what else could be useful for the tool.
