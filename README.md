@@ -73,10 +73,16 @@ PacketSifter can now perform hash lookups via VirusTotal API of exported objects
          root@ubuntu:~# apt-get install curl
 <br>
 3. Download the new version of packetsifter.sh and the new script VTInitial.sh <br>
-4. Run VTInitial.sh in the same folder as packetsifter.sh and supply your 64 character alphanumeric VirusTotal API Key <br>
+  4. Run VTInitial.sh in the same folder as packetsifter.sh and supply your 64 character alphanumeric VirusTotal API Key when prompted <br>
         &emsp;For instructions on how to obtain a free VirusTotal API Key https://developers.virustotal.com/reference <br>
-
-
+<br>
+<b> Successful output of VTInitial.sh is shown below: </b>
+<img src=https://github.com/packetsifter/packetsifterTool/blob/main/screenshots/VTSuccess.png></img>
+<br>
+5. Run PacketSifter and export either HTTP and/or SMB objects. Answer Y to performing lookups via VirusTotal when prompted. <br>
+<br>
+<b>Successful output of VirusTotal integration and subsequent generated httpVTResults.txt / smbVTResults.txt shown below: </b>
+<img src=https://github.com/packetsifter/packetsifterTool/blob/main/screenshots/VTOutput.png></img>
         
 
 
