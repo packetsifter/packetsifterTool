@@ -1,5 +1,7 @@
 # PacketSifter
-<img src=https://github.com/packetsifter/packetsifterTool/blob/main/screenshots/logo-nobackground-500.png class="center"></img>
+<p align="center">
+<img src=https://github.com/packetsifter/packetsifterTool/blob/main/screenshots/logo-nobackground-500.png></img>
+</p>
 
 PacketSifter is a tool/script that is designed to aid analysts in sifting through a packet capture (pcap) to find noteworthy traffic. Packetsifter accepts a pcap as an argument and outputs several files.<br>
 PackerSifter does NOT perform analysis for you. It simply sifts through data and puts specific pieces of data in buckets for ease of analysis. PacketSifter can be used to find IOCs present in a pcap however, you must still be able to interpret the data and drill down into the pcap to find points of interest.
