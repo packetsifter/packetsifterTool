@@ -253,7 +253,7 @@ printf '\nWould you like to lookup IP reputation/geolocation for DNS A record re
 				sed -i '1d' dstip.txt
 			while read ABU
 			do
-				curl -G https://api.abuseipdb.com/api/v2/check   --data-urlencode "ipAddress=$ABU"   -d maxAgeInDays=90   -d verbose   -H "Key: Test"   -H "Accept: application/json" | jq '. | {IPaddress: .data.ipAddress, Domain: .data.domain, AbuseConfidenceScore: .data.abuseConfidenceScore, CountryCode: .data.countryCode, CountryName: .data.countryName}' >> output.txt
+				curl -s -G https://api.abuseipdb.com/api/v2/check   --data-urlencode "ipAddress=$ABU"   -d maxAgeInDays=90   -d verbose   -H "Key: Test"   -H "Accept: application/json" | jq '. | {IPaddress: .data.ipAddress, Domain: .data.domain, AbuseConfidenceScore: .data.abuseConfidenceScore, CountryCode: .data.countryCode, CountryName: .data.countryName}' >> output.txt
 			done < dstip.txt
 			sed '/}/a\'$'\n' output.txt > IPLookupResults.txt
 			rm output.txt
