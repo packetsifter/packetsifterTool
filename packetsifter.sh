@@ -123,7 +123,7 @@ then
 
 				while read ARG
 				do
-					curl -s --request GET   --url https://www.virustotal.com/api/v3/files/$ARG  --header 'x-apikey: test' | jq '.data.attributes.md5, .data.attributes.last_analysis_stats, .error' | grep -E code\|[a-f0-9]{32}\|malicious\|undetected >> output.txt
+					curl -s --request GET   --url https://www.virustotal.com/api/v3/files/$ARG  --header 'x-apikey: 48e08648744b50cc161d6e7092d169e9d8de503b29c28dd3ad7720c7751f584c' | jq '.data.attributes.md5, .data.attributes.last_analysis_stats, .error' | grep -E code\|[a-f0-9]{32}\|malicious\|undetected >> output.txt
 				done < lookup.txt
 				sed '/undetected/a\'$'\n'  output.txt > output2.txt 
 				sed '/message/a\'$'\n' output2.txt > httpVTResults.txt
@@ -202,7 +202,7 @@ then
 
 				while read THE
 				do
-					curl -s --request GET   --url https://www.virustotal.com/api/v3/files/$THE  --header 'x-apikey: test' | jq '.data.attributes.md5, .data.attributes.last_analysis_stats, .error' | grep -E code\|[a-f0-9]{32}\|malicious\|undetected >> output.txt
+					curl -s --request GET   --url https://www.virustotal.com/api/v3/files/$THE  --header 'x-apikey: data' | jq '.data.attributes.md5, .data.attributes.last_analysis_stats, .error' | grep -E code\|[a-f0-9]{32}\|malicious\|undetected >> output.txt
 				done < lookupsmb.txt
 				sed '/undetected/a\'$'\n'  output.txt > output2.txt 
 				sed '/message/a\'$'\n' output2.txt > smbVTResults.txt
@@ -242,6 +242,23 @@ if [[ $dnsacheck -eq 1 ]]; then
 	printf 'No DNS A records found. Deleting arbitrary dnsARecords.txt\n'
 fi
 
+#AbuseIPDB lookup for A Records
+
+printf '\nWould you like to lookup IP reputation/geolocation for DNS A record responses using AbuseIPDB?\n**Warning** You must have ran the AbuseIPDBInitial.sh script to initialize PacketSifter with your AbuseIPDB API Key.\n'
+		printf '(Please supply Y for yes or N for no)\n'
+		read AbuseLookup
+		if [ $AbuseLookup == 'Y' ] | [ $AbuseLookup == 'y' ]
+			then
+				tshark -nr $pcap -T fields -e dns.a | sort | uniq | tr ',' '\n' > dstip.txt
+				sed -i '1d' dstip.txt
+			while read ABU
+			do
+				curl -G https://api.abuseipdb.com/api/v2/check   --data-urlencode "ipAddress=$ABU"   -d maxAgeInDays=90   -d verbose   -H "Key: Test"   -H "Accept: application/json" | jq '. | {IPaddress: .data.ipAddress, Domain: .data.domain, AbuseConfidenceScore: .data.abuseConfidenceScore, CountryCode: .data.countryCode, CountryName: .data.countryName}' >> output.txt
+			done < dstip.txt
+			sed '/}/a\'$'\n' output.txt > IPLookupResults.txt
+			rm output.txt
+			rm dstip.txt
+		fi
 
 
 #DNS TXT records
@@ -285,3 +302,5 @@ fi
 #sifting done
 printf '\nPacket sifting complete! Thanks for using the tool.\n'
 printf '\nHappy hunting!\n'
+
+
