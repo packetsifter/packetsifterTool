@@ -249,7 +249,7 @@ printf '\nWould you like to lookup IP reputation/geolocation for DNS A record re
 		read AbuseLookup
 		if [ $AbuseLookup == 'Y' ] | [ $AbuseLookup == 'y' ]
 			then
-				tshark -nr $pcap -T fields -e dns.a | sort | uniq | tr ',' '\n' > dstip.txt
+				tshark -nr $pcap -T fields -e dns.a | tr ',' '\n' | sort | uniq > dstip.txt
 				sed -i '1d' dstip.txt
 			while read ABU
 			do
