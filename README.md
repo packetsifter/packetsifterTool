@@ -6,6 +6,9 @@
 PacketSifter is a tool/script that is designed to aid analysts in sifting through a packet capture (pcap) to find noteworthy traffic. Packetsifter accepts a pcap as an argument and outputs several files.<br>
 PackerSifter does NOT perform analysis for you. It simply sifts through data and puts specific pieces of data in buckets for ease of analysis. PacketSifter can be used to find IOCs present in a pcap however, you must still be able to interpret the data and drill down into the pcap to find points of interest.
 
+<b>03/04/2021</b></br>
+PacketSifter can now perform GEOIP + IP reputation lookups of returned DNS A Records by leveraging AbuseIPDB's API!
+
 <b>01/08/2021</b><br>
 PacketSifter has received a major update to support VirusTotal lookups of objects exported by PacketSifter.
 
@@ -55,6 +58,10 @@ VirusTotal Integration output text files (all optional):
         <li>smbHashToObject.txt - Text file containing md5 hash to object pairing for reference </li>
         <li>smbVTResults.txt - Text file containing results of md5 hash lookup of smb objects via VirusTotal API </li>
     </ul><br>
+AbuseIPDB Integration output text files (optional):
+    <ul>
+        <li>IPLookupResults.txt - Text file containing IP Geo-location + IP reputation results</li>
+    </ul><br>
 Currently, PacketSifter generates the following tar.gz files:
 <ul>
 <li>httpObjects.tar.gz (optional) - HTTP objects observed in pcap. <<Warning>> There could be a lot of HTTP objects and you can potentially extract malicious http objects depending on the pcap. Use with caution!! </li>
@@ -86,7 +93,26 @@ PacketSifter can now perform hash lookups via VirusTotal API of exported objects
 <br>
 <b>Successful output of VirusTotal integration and subsequent generated httpVTResults.txt / smbVTResults.txt shown below: </b>
 <img src=https://github.com/packetsifter/packetsifterTool/blob/main/screenshots/VTOutput.png></img>
+
+
+# AbuseIPDB Integration
+PacketSifter can perform IP Geo-location + IP reputation lookups of IP addresses returned in DNS A Records. <br>
+<br>
+<b>Steps to configure PacketSifter with AbuseIPDB integration:</b><br>
+<br>
+
+1. Ensure you have jq (https://stedolan.github.io/jq/download/)installed. <br>
+
+        root@ubuntu:~# apt-get install jq
         
+2. Ensure you have curl installed. <br>
+
+         root@ubuntu:~# apt-get install curl
+<br>
+3. Download the new version of packetsifter.sh and the new script AbuseIPDBInitial.sh <br>
+  4. Run AbuseIPDBInitial.sh in the same folder as packetsifter.sh and supply your 80 character alphanumeric AbuseIPDB API Key when prompted. <br>        &emsp;For instructions on how to obtain a free AbuseIPDB API Key https://www.abuseipdb.com/register <br>
+<br>
+<b> Successful output of AbuseIPDBInitial.sh is shown below: </b>
 
 
 
