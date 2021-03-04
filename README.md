@@ -112,7 +112,17 @@ PacketSifter can perform IP Geo-location + IP reputation lookups of IP addresses
 3. Download the new version of packetsifter.sh and the new script AbuseIPDBInitial.sh <br>
   4. Run AbuseIPDBInitial.sh in the same folder as packetsifter.sh and supply your 80 character alphanumeric AbuseIPDB API Key when prompted. <br>        &emsp;For instructions on how to obtain a free AbuseIPDB API Key https://www.abuseipdb.com/register <br>
 <br>
+**AbuseIPDB free API keys have a limit of 1000 lookups a day** <br>
 <b> Successful output of AbuseIPDBInitial.sh is shown below: </b>
+<img src=https://github.com/packetsifter/packetsifterTool/blob/main/screenshots/AbuseIPDBInitialSuccess.png></img>
+<br>
+5. Run PacketSifter and answer Y to performing lookups on DNS A records via AbuseIPDB when prompted. <br>
+<br>
+<b>Successful output of AbuseIPDB integration and subsequent generated IPLookupResults.txt shown below: </b>
+<br>
+**Confidence Score is on a 0-100 percent confidence scale**
+<br>
+<img src=https://github.com/packetsifter/packetsifterTool/blob/main/screenshots/IPLookupResults.png></img>
 
 
 
