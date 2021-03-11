@@ -123,7 +123,7 @@ then
 
 				while read ARG
 				do
-					curl -s --request GET   --url https://www.virustotal.com/api/v3/files/$ARG  --header 'x-apikey: 48e08648744b50cc161d6e7092d169e9d8de503b29c28dd3ad7720c7751f584c' | jq '.data.attributes.md5, .data.attributes.last_analysis_stats, .error' | grep -E code\|[a-f0-9]{32}\|malicious\|undetected >> output.txt
+					curl -s --request GET   --url https://www.virustotal.com/api/v3/files/$ARG  --header 'x-apikey: test' | jq '.data.attributes.md5, .data.attributes.last_analysis_stats, .error' | grep -E code\|[a-f0-9]{32}\|malicious\|undetected >> output.txt
 				done < lookup.txt
 				sed '/undetected/a\'$'\n'  output.txt > output2.txt 
 				sed '/message/a\'$'\n' output2.txt > httpVTResults.txt
