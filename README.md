@@ -74,7 +74,7 @@ PacketSifter can now perform hash lookups via VirusTotal API of exported objects
 <b>Steps to configure PacketSifter with VirusTotal integration:</b><br>
 <br>
 
-1. Ensure you have jq (https://stedolan.github.io/jq/download/)installed. <br>
+1. Ensure you have jq (https://stedolan.github.io/jq/download/)  installed. <br>
 
         root@ubuntu:~# apt-get install jq
         
@@ -101,7 +101,7 @@ PacketSifter can perform IP Geo-location + IP reputation lookups of IP addresses
 <b>Steps to configure PacketSifter with AbuseIPDB integration:</b><br>
 <br>
 
-1. Ensure you have jq (https://stedolan.github.io/jq/download/)installed. <br>
+1. Ensure you have jq (https://stedolan.github.io/jq/download/)  installed. <br>
 
         root@ubuntu:~# apt-get install jq
         
