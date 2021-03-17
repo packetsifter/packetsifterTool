@@ -232,7 +232,7 @@ if [[ $dnspcapcheck -eq 0 ]]; then
 fi
 
 #DNS A record
-tshark -nr $pcap -Y 'dns.qry.type == 1' -E header=y -T fields -e ip.src -e ip.dst -e dns.qry.name -e dns.a  > dnsARecords.txt 2>>errors.txt
+tshark -nr $pcap -Y 'dns.qry.type == 1' -E header=y -T fields -e frame.number -e ip.src -e ip.dst -e dns.qry.name -e dns.a  > dnsARecords.txt 2>>errors.txt
 printf '\nDNS A query/responses have been outputted to dnsARecords.txt\n'
 
 #DNS A record check
@@ -262,7 +262,7 @@ printf '\nWould you like to lookup IP reputation/geolocation for DNS A record re
 
 
 #DNS TXT records
-tshark -nr $pcap -Y 'dns.qry.type == 16' -E header=y -T fields -e ip.src -e ip.dst -e dns.resp.name -e dns.txt > dnsTXTRecords.txt 2>>errors.txt
+tshark -nr $pcap -Y 'dns.qry.type == 16' -E header=y -T fields -e frame.number -e ip.src -e ip.dst -e dns.resp.name -e dns.txt > dnsTXTRecords.txt 2>>errors.txt
 printf '\nDNS TXT query/responses have been outputted to dnsTXTRecords.txt. DNS TXT records can be used for nefarious reasons and should be glanced over for any abnormalities.\n'
 
 #DNS TXT record check
