@@ -1,7 +1,67 @@
 #!/usr/bin/env bash
 
-#user supplied pcap from cli
-pcap=$1
+
+Help()
+{
+	echo "PacketSifter is a tool to perform batch processing of PCAP data to uncover potential IOCs"
+	echo "Simply pass PacketSifter a pcap and the desired switches and PacketSifter will sift through the data and generate several output files"
+	echo "Please run AbuseIPDBInitial.sh and VTInitial.sh prior to using their corresponding switches or the integrations will not work"
+	echo 
+	echo "USAGE: ./packetsifter.sh -i yourpcap.pcap [-g|h|r|v]"
+	echo
+	echo "OPTIONS:"
+	echo "	-g		enable abuseipdb lookups of IP addresses in DNS A records"
+	echo "	-h		print help"
+	echo "	-i		input file   [Required]"
+	echo "	-r		resolve hostnames in pcap  [Can result in DNS queries to attacker infrastructure]"
+	echo "	-v		enable virustotal lookup of exported smb/http objects"
+	
+	
+}
+
+
+while getopts 'i:hrvg' opt; do
+	case "${opt}" in
+		h)
+			Help
+			exit 1
+			;;
+		
+		i)
+			pcap=$OPTARG
+			;;
+			
+		r)
+			RESOLVE=1
+			;;
+			
+		v)
+			VTINT=1
+			;;
+			
+		g)
+			ABINT=1
+			;;
+		
+		\?)
+			echo
+			Help
+			exit 1
+			;;
+			
+			
+	esac
+done
+
+if [ ! "$pcap" ]
+	then
+	echo "error: no -i option specified"
+	echo
+	Help
+	exit 1
+fi
+
+shift "$((OPTIND -1))"
 
 #header
 printf '
@@ -56,21 +116,16 @@ if [[ $httpcheck -eq 36 ]]; then
 fi
 
 
-
-#ask to resolve hostnames
-printf '\nWould you like to resolve host names observed in pcap? This may take a long time depending on the pcap!!\n'
-printf '<<Warning>> This can result in DNS queries for attacker infrastructure. Proceed with caution!!\n'
-printf '(Please supply Y for yes or N for no)\n'
-read hostnameAnswer
-
-#if statement for host resolution
-if [  $hostnameAnswer == 'Y' ] || [ $hostnameAnswer == 'y' ]
-then
-	tshark -nr $pcap -N Nnt -z hosts > deletethis.txt 2>>errors.txt
-	cat deletethis.txt | grep '# TShark' -A 100000000 > hostnamesResolved.txt
-	rm deletethis.txt
-	printf '\nhostnamesResolved.txt contains resolved hostnames observed in pcap\n'
+#check for hostname flag
+if [[ $RESOLVE -eq 1 ]]
+	then
+		echo "Performing hostname resolution, please be patient."
+		tshark -nr $pcap -N Nnt -z hosts > deletethis.txt 2>>errors.txt
+		cat deletethis.txt | grep '# TShark' -A 100000000 > hostnamesResolved.txt
+		rm deletethis.txt
+		printf '\nhostnamesResolved.txt contains resolved hostnames observed in pcap\n'
 fi
+
 
 #HTTP pcap carving
 tshark -nr $pcap -n -Y '(tcp.port==80 || tcp.port==8080 || tcp.port==8000)' -w http.pcap 2>>errors.txt
@@ -84,36 +139,27 @@ if [[ $httppcapcheck -eq 0 ]]; then
 fi
 
 
-#prompt for user input to export
-printf '\nWould you like to export HTTP objects? The objects will be outputted to a tarball in the current directory titled: httpObjects.tar.gz' 
+#export HTTP objects
+printf '\nExporting HTTP objects. The objects will be outputted to a tarball in the current directory titled: httpObjects.tar.gz' 
 printf '\n<<Warning>> There could be a lot of HTTP objects and you can potentially extract malicious http objects depending on the pcap. Use with caution!!\n'
 
-printf '(Please supply Y for yes or N for no)\n'
 
-#capture user input
-read httpAnswer
+tshark -nr $pcap -q --export-objects http,./httpObjects 2>>errors.txt
+tar -czf httpObjects.tar.gz ./httpObjects
+rm -rf ./httpObjects
 
-#if statement to check if yes, then pull objects
-if [ $httpAnswer == 'Y' ] || [ $httpAnswer == 'y' ]
-then
-	tshark -nr $pcap -q --export-objects http,./httpObjects 2>>errors.txt
-	tar -czf httpObjects.tar.gz ./httpObjects
-	rm -rf ./httpObjects
-
-#HTTP Object Check
-	httpobjectcheck=$(tar -xzvf httpObjects.tar.gz | wc -l)
+#Empty HTTP Object Check
+httpobjectcheck=$(tar -xzvf httpObjects.tar.gz | wc -l)
 	if [[ $httpobjectcheck -eq 1 ]]; then
 		rm httpObjects.tar.gz
 		rm -rf ./httpObjects
 		printf '\nNo HTTP Objects found. Deleting arbitrary httpObjects.tar.gz.\n'
 		rm -rf ./httpObjects
 	else
-#VirusTotal Integration HTTP
-		printf '\nWould you like to lookup exported HTTP objects using VirusTotal?\n**Warning** You must have ran the VTinitial.sh script to initialize PacketSifter with your VirusTotal API Key.\n'
-		printf '(Please supply Y for yes or N for no)\n'
-		read VTHTTPLookup
-			if [ $VTHTTPLookup == 'Y' ] | [ $VTHTTPLookup == 'y' ]
-			then
+#VirusTotal Integration HTTP check
+	if [[ $VTINT -eq 1 ]]
+		then
+				echo "Performing HTTP Object Lookups via VirusTotal. Please be patient. (Note: please ensure you have ran the VTInitial.sh script prior to use)"
 				tar -xzf httpObjects.tar.gz
 				for VAL in $(ls ./httpObjects)
 				do
@@ -123,15 +169,14 @@ then
 
 				while read ARG
 				do
-					curl -s --request GET   --url https://www.virustotal.com/api/v3/files/$ARG  --header 'x-apikey: test' | jq '.data.attributes.md5, .data.attributes.last_analysis_stats, .error' | grep -E code\|[a-f0-9]{32}\|malicious\|undetected >> output.txt
+					curl -s --request GET   --url https://www.virustotal.com/api/v3/files/$ARG  --header 'x-apikey: value' | jq '. | {MD5: .data.attributes.md5, Malicious: .data.attributes.last_analysis_stats.malicious, Undetected: .data.attributes.last_analysis_stats.undetected, Errors: .error}' >> output.txt
 				done < lookup.txt
-				sed '/undetected/a\'$'\n'  output.txt > output2.txt 
-				sed '/message/a\'$'\n' output2.txt > httpVTResults.txt
+				sed '/}/a\'$'\n' output.txt > output2.txt
+				sed '/null/d' output2.txt > httpVTResults.txt
 				rm -rf ./httpObjects
+				rm output2.txt
 				rm lookup.txt
 				rm output.txt
-				rm output2.txt
-			fi
 	fi
 	rm -rf ./httpObjects
 
@@ -163,36 +208,26 @@ if [[ $smbpcapcheck -eq 0 ]]; then
 	printf '\nNo SMB traffic found. Deleting arbitrary smb.pcap.\n'
 fi
 
-#prompt for user input on extracting smb objects
-printf '\nWould you like to export SMB objects? The objects will be outputted to a tarball in the current directory titled: smbObjects.tar.gz\n' 
+#export SMB objects
+printf '\nExporting SMB objects. The objects will be outputted to a tarball in the current directory titled: smbObjects.tar.gz' 
 printf '\n<<Warning>> There could be a lot of SMB objects and you can potentially extract malicious SMB objects depending on the pcap. Use with caution!!\n'
 
-printf '(Please supply Y for yes or N for no)\n'
+tshark -nr $pcap -q --export-objects smb,./smbObjects 2>>errors.txt
+tar -czf smbObjects.tar.gz ./smbObjects
+rm -rf ./smbObjects
 
-#prompt for user input
-read smbAnswer
 
-
-#if statement to check if yes, then pull objects
-if [ $smbAnswer == 'Y' ] || [ $smbAnswer == 'y' ]
-then
-	tshark -nr $pcap -q --export-objects smb,./smbObjects 2>>errors.txt
-	tar -czf smbObjects.tar.gz ./smbObjects
+#empty SmbObject Check
+smbobjectcheck=$(tar -xzvf smbObjects.tar.gz | wc -l)
+if [[ $smbobjectcheck -eq 1 ]]; then
+	rm smbObjects.tar.gz
 	rm -rf ./smbObjects
-
-#SmbObject Check
-	smbobjectcheck=$(tar -xzvf smbObjects.tar.gz | wc -l)
-	if [[ $smbobjectcheck -eq 1 ]]; then
-		rm smbObjects.tar.gz
-		rm -rf ./smbObjects
-		printf '\nNo SMB Objects found. Deleting arbitrary smbObjects.tar.gz.\n'
-	else
+	printf '\nNo SMB Objects found. Deleting arbitrary smbObjects.tar.gz.\n'
+else
 #VirusTotal Integration
-		printf '\nWould you like to lookup exported SMB objects using VirusTotal?\n**Warning** You must have ran the VTinitial.sh script to initialize PacketSifter with your VirusTotal API Key.\n'
-		printf '(Please supply Y for yes or N for no)\n'
-		read VTSMBLookup
-			if [ $VTSMBLookup == 'Y' ] | [ $VTSMBLookup == 'y' ]
+			if [[ $VTINT -eq 1 ]]
 			then
+				echo "Performing SMB Object lookups via VirusTotal. (Note: please ensure you have ran the VTInitial.sh script prior to use)"
 				tar -xzf smbObjects.tar.gz
 				for OBJ in $(ls ./smbObjects)
 				do
@@ -202,15 +237,15 @@ then
 
 				while read THE
 				do
-					curl -s --request GET   --url https://www.virustotal.com/api/v3/files/$THE  --header 'x-apikey: data' | jq '.data.attributes.md5, .data.attributes.last_analysis_stats, .error' | grep -E code\|[a-f0-9]{32}\|malicious\|undetected >> output.txt
+					curl -s --request GET   --url https://www.virustotal.com/api/v3/files/$THE  --header 'x-apikey: value' | jq '. | {MD5: .data.attributes.md5, Malicious: .data.attributes.last_analysis_stats.malicious, Undetected: .data.attributes.last_analysis_stats.undetected, Errors: .error}' >> output.txt
 				done < lookupsmb.txt
-				sed '/undetected/a\'$'\n'  output.txt > output2.txt 
-				sed '/message/a\'$'\n' output2.txt > smbVTResults.txt
+				sed '/}/a\'$'\n' output.txt > output2.txt
+				sed '/null/d' output2.txt > smbVTResults.txt
 				rm -rf ./smbObjects
+				rm output2.txt
 				rm lookupsmb.txt
 				rm output.txt
-				rm output2.txt
-			fi
+			
 	fi
 	rm -rf ./smbObjects
 fi
@@ -240,26 +275,23 @@ dnsacheck=$(cat dnsARecords.txt | wc -l)
 if [[ $dnsacheck -eq 1 ]]; then
 	rm dnsARecords.txt
 	printf 'No DNS A records found. Deleting arbitrary dnsARecords.txt\n'
-fi
-
-#AbuseIPDB lookup for A Records
-
-printf '\nWould you like to lookup IP reputation/geolocation for DNS A record responses using AbuseIPDB?\n**Warning** You must have ran the AbuseIPDBInitial.sh script to initialize PacketSifter with your AbuseIPDB API Key.\n'
-		printf '(Please supply Y for yes or N for no)\n'
-		read AbuseLookup
-		if [ $AbuseLookup == 'Y' ] | [ $AbuseLookup == 'y' ]
+	else
+#AbuseIPDB variable check
+		if [[ $ABINT -eq 1 ]]
 			then
-				tshark -nr $pcap -T fields -e dns.a | tr ',' '\n' | sort | uniq > dstip.txt
+			echo "Performing IP Reputation lookups via AbuseIPDB. (Note: please ensure you have ran the AbuseIPDBInitial.sh script prior to use)"
+			tshark -nr $pcap -T fields -e dns.a | tr ',' '\n' | sort | uniq > dstip.txt
 				sed -i '1d' dstip.txt
 			while read ABU
 			do
-				curl -s -G https://api.abuseipdb.com/api/v2/check   --data-urlencode "ipAddress=$ABU"   -d maxAgeInDays=90   -d verbose   -H "Key: Test"   -H "Accept: application/json" | jq '. | {IPaddress: .data.ipAddress, Domain: .data.domain, AbuseConfidenceScore: .data.abuseConfidenceScore, CountryCode: .data.countryCode, CountryName: .data.countryName}' >> output.txt
+				curl -s -G https://api.abuseipdb.com/api/v2/check   --data-urlencode "ipAddress=$ABU"   -d maxAgeInDays=90   -d verbose   -H "Key: test"   -H "Accept: application/json" | jq '. | {IPaddress: .data.ipAddress, Domain: .data.domain, AbuseConfidenceScore: .data.abuseConfidenceScore, CountryCode: .data.countryCode, CountryName: .data.countryName}' >> output.txt
 			done < dstip.txt
 			sed '/}/a\'$'\n' output.txt > IPLookupResults.txt
 			rm output.txt
 			rm dstip.txt
 		fi
-
+fi
+			
 
 #DNS TXT records
 tshark -nr $pcap -Y 'dns.qry.type == 16' -E header=y -T fields -e frame.number -e ip.src -e ip.dst -e dns.resp.name -e dns.txt > dnsTXTRecords.txt 2>>errors.txt
@@ -302,5 +334,3 @@ fi
 #sifting done
 printf '\nPacket sifting complete! Thanks for using the tool.\n'
 printf '\nHappy hunting!\n'
-
-
