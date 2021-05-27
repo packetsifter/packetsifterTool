@@ -3,17 +3,16 @@
 <img src=https://github.com/packetsifter/packetsifterTool/blob/main/screenshots/logo-nobackground-500.png></img>
 </p>
 
-PacketSifter is a tool/script that is designed to aid analysts in sifting through a packet capture (pcap) to find noteworthy traffic. Packetsifter accepts a pcap as an argument and outputs several files.<br>
-PackerSifter does NOT perform analysis for you. It simply sifts through data and puts specific pieces of data in buckets for ease of analysis. PacketSifter can be used to find IOCs present in a pcap however, you must still be able to interpret the data and drill down into the pcap to find points of interest.
+# What is PacketSifter?
+PacketSifter is a tool to perform batch processing of PCAP data to uncover potential IOCs.<br>
+Simply initializePacketSifter with your desired integrations (VirusTotal, AbuseIPDB) and pass PacketSifter a pcap and the desired switches and PacketSifter will sift through the data and generate several output files. <br>
+<br>
+**Note** Please run AbuseIPDBInitial.sh and VTInitial.sh prior to using their corresponding switches or the integrations will not work
 
-<b>03/04/2021</b></br>
-PacketSifter can now perform GEOIP + IP reputation lookups of returned DNS A Records by leveraging AbuseIPDB's API!
+<br><b>05/27/2021</b></br>
+PacketSifter has been revamped to allow a more streamlined interaction with the user. Simply download the new updated packetsifter.sh, run ./packetsifter -h and learn how to properly use the new PacketSifter!
 
-<b>01/08/2021</b><br>
-PacketSifter has received a major update to support VirusTotal lookups of objects exported by PacketSifter.
 
-<b>12/31/2020</b><br>
-Updated to delete associated txt/pcap files that contain 0 results, i.e., when 0 SMB results are found in pcap, all associated SMB output files produced by PacketSifter will be automatically deleted.
 
 
 # Author
@@ -21,11 +20,11 @@ Updated to delete associated txt/pcap files that contain 0 results, i.e., when 0
 
 
 # How it works
-Simply pass PacketSifter your pcap to analyze and answer Y or N when prompted and you're done!
+Simply pass PacketSifter your pcap to analyze along with your desired flags and let PacketSifter do the work for you!
 
 <h5>Example:</h5> 
 
-  root@ubuntu:~# ./packetsifter /tmp/testing.pcap
+  root@ubuntu:~# ./packetsifter -i /tmp/testing.pcap -grv
 
 # Requirements
   tshark - https://tshark.dev/setup/install/
@@ -64,8 +63,8 @@ AbuseIPDB Integration output text files (optional):
     </ul><br>
 Currently, PacketSifter generates the following tar.gz files:
 <ul>
-<li>httpObjects.tar.gz (optional) - HTTP objects observed in pcap. <<Warning>> There could be a lot of HTTP objects and you can potentially extract malicious http objects depending on the pcap. Use with caution!! </li>
-<li>smbObjects.tar.gz (optional) - SMB objects observed in pcap. There could be a lot of SMB objects and you can potentially extract malicious SMB objects depending on the pcap. Use with caution!! </li>
+<li>httpObjects.tar.gz - HTTP objects observed in pcap. <<Warning>> There could be a lot of HTTP objects and you can potentially extract malicious http objects depending on the pcap. Use with caution!! </li>
+<li>smbObjects.tar.gz - SMB objects observed in pcap. There could be a lot of SMB objects and you can potentially extract malicious SMB objects depending on the pcap. Use with caution!! </li>
 </ul>
 
 # VirusTotal Integration
@@ -89,7 +88,7 @@ PacketSifter can now perform hash lookups via VirusTotal API of exported objects
 <b> Successful output of VTInitial.sh is shown below: </b>
 <img src=https://github.com/packetsifter/packetsifterTool/blob/main/screenshots/VTSuccess.png></img>
 <br>
-5. Run PacketSifter and export either HTTP and/or SMB objects. Answer Y to performing lookups via VirusTotal when prompted. <br>
+5. Run PacketSifter with the -v flag to enable VirusTotal lookups of exported HTTP and SMB objects. <br>
 <br>
 <b>Successful output of VirusTotal integration and subsequent generated httpVTResults.txt / smbVTResults.txt shown below: </b>
 <img src=https://github.com/packetsifter/packetsifterTool/blob/main/screenshots/VTOutput.png></img>
@@ -116,7 +115,7 @@ PacketSifter can perform IP Geo-location + IP reputation lookups of IP addresses
 <b> Successful output of AbuseIPDBInitial.sh is shown below: </b>
 <img src=https://github.com/packetsifter/packetsifterTool/blob/main/screenshots/AbuseIPDBInitialSuccess.png></img>
 <br>
-5. Run PacketSifter and answer Y to performing lookups on DNS A records via AbuseIPDB when prompted. <br>
+5. Run PacketSifter with the -g flag to enable lookups on DNS A records via AbuseIPDB. <br>
 <br>
 <b>Successful output of AbuseIPDB integration and subsequent generated IPLookupResults.txt shown below: </b>
 <br>
