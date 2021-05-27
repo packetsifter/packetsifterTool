@@ -7,10 +7,10 @@ Help()
 	echo "Simply pass PacketSifter a pcap and the desired switches and PacketSifter will sift through the data and generate several output files"
 	echo "Please run AbuseIPDBInitial.sh and VTInitial.sh prior to using their corresponding switches or the integrations will not work"
 	echo 
-	echo "USAGE: ./packetsifter.sh -i yourpcap.pcap [-g|h|r|v]"
+	echo "USAGE: ./packetsifter.sh -i yourpcap.pcap [-a|h|r|v]"
 	echo
 	echo "OPTIONS:"
-	echo "	-g		enable abuseipdb lookups of IP addresses in DNS A records"
+	echo "	-a		enable abuseipdb lookups of IP addresses in DNS A records"
 	echo "	-h		print help"
 	echo "	-i		input file   [Required]"
 	echo "	-r		resolve hostnames in pcap  [Can result in DNS queries to attacker infrastructure]"
@@ -20,7 +20,7 @@ Help()
 }
 
 
-while getopts 'i:hrvg' opt; do
+while getopts 'i:hrva' opt; do
 	case "${opt}" in
 		h)
 			Help
@@ -39,7 +39,7 @@ while getopts 'i:hrvg' opt; do
 			VTINT=1
 			;;
 			
-		g)
+		a)
 			ABINT=1
 			;;
 		
@@ -119,7 +119,7 @@ fi
 #check for hostname flag
 if [[ $RESOLVE -eq 1 ]]
 	then
-		echo "Performing hostname resolution, please be patient."
+		echo "Performing hostname resolution, please be patient. <<Warning>> This will potentially result in DNS queries to attacker infrastructure"
 		tshark -nr $pcap -N Nnt -z hosts > deletethis.txt 2>>errors.txt
 		cat deletethis.txt | grep '# TShark' -A 100000000 > hostnamesResolved.txt
 		rm deletethis.txt
