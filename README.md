@@ -24,7 +24,17 @@ Simply pass PacketSifter your pcap to analyze along with your desired flags and 
 
 <h5>Example:</h5> 
 
-  root@ubuntu:~# ./packetsifter -i /tmp/testing.pcap -grv
+  root@ubuntu:~# ./packetsifter -i /tmp/testing.pcap -a -r -v
+  
+# Command Line Options
+OPTIONS:
+    <ul>
+    <li> -a      &emsp;  enable abuseipdb lookups of IP addresses in DNS A records </li>
+    <li> -h      &emsp;  print help </li>
+    <li> -i      &emsp;  input file [Required] </li>
+    <li> -r      &emsp;  resolve hostnames in pcap [Can result in DNS queries to attacker infrastructure] </li>
+    <li> -v      &emsp;  enable VirusTotal lookup of exported SMB/HTTP objects </li>
+    </ul>
 
 # Requirements
   tshark - https://tshark.dev/setup/install/
@@ -115,7 +125,7 @@ PacketSifter can perform IP Geo-location + IP reputation lookups of IP addresses
 <b> Successful output of AbuseIPDBInitial.sh is shown below: </b>
 <img src=https://github.com/packetsifter/packetsifterTool/blob/main/screenshots/AbuseIPDBInitialSuccess.png></img>
 <br>
-5. Run PacketSifter with the -g flag to enable lookups on DNS A records via AbuseIPDB. <br>
+5. Run PacketSifter with the -a flag to enable lookups on DNS A records via AbuseIPDB. <br>
 <br>
 <b>Successful output of AbuseIPDB integration and subsequent generated IPLookupResults.txt shown below: </b>
 <br>
